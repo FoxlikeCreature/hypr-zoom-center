@@ -1,0 +1,11 @@
+[repository]
+name = "hypr-zoom-center"
+authors = ["hyprfox"]
+
+[zoomcenter]
+description = "Anchor the cursor zoom to the centre of the monitor instead of the pointer"
+authors = ["hyprfox"]
+output = "zoomcenter.so"
+build = [
+    "make all",
+]
