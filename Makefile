@@ -9,7 +9,7 @@ CXXFLAGS ?= -O2
 CXXFLAGS += -shared -fPIC -std=c++2b
 
 all:
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(EXTRA_FLAGS) main.cpp -o zoomcenter.so `pkg-config --cflags pixman-1 libdrm hyprland pangocairo libinput libudev wayland-server xkbcommon`
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(EXTRA_FLAGS) main.cpp -o zoomcenter.so `pkg-config --cflags pixman-1 libdrm hyprland pangocairo libinput libudev wayland-server xkbcommon lua-5.5`
 
 clean:
 	rm -f ./zoomcenter.so
