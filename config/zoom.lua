@@ -20,6 +20,11 @@ local cfg = {
     min    = 1.0,
     max    = 10.0,
 
+    -- Motion is divided by factor^sens_exponent while zoomed. 1.0 keeps the
+    -- on-screen speed exactly as it was, 0.0 disables compensation, values in
+    -- between soften it.
+    sens_exponent = 1.0,
+
     -- With the anchor pinned these only complicate the render path, so both stay
     -- off: the zoom is already fixed and centred.
     rigid           = false,
@@ -116,6 +121,8 @@ function HYPRZOOM.teardown()
     })
     HYPRZOOM = nil
 end
+
+pcall(plugin.sens_exponent, cfg.sens_exponent)
 
 set({
     zoom_rigid           = cfg.rigid,
