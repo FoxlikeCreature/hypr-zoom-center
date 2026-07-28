@@ -54,6 +54,18 @@ static SDispatchResult onUnpin(std::string) {
     return {};
 }
 
+// A Lua config cannot reach plugin dispatchers, so the same two actions are also
+// exported as hl.plugin.zoomcenter.pin() / .unpin().
+static int luaPin(lua_State* L) {
+    onPin("");
+    return 0;
+}
+
+static int luaUnpin(lua_State* L) {
+    onUnpin("");
+    return 0;
+}
+
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     PHANDLE = handle;
 
@@ -67,6 +79,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
     HyprlandAPI::addDispatcherV2(PHANDLE, "zoomcenter:pin", onPin);
     HyprlandAPI::addDispatcherV2(PHANDLE, "zoomcenter:unpin", onUnpin);
+
+    HyprlandAPI::addLuaFunction(PHANDLE, "zoomcenter", "pin", luaPin);
+    HyprlandAPI::addLuaFunction(PHANDLE, "zoomcenter", "unpin", luaUnpin);
 
     return {"zoomcenter", "Anchor the cursor zoom to the centre of the monitor", "hyprfox", "1.0"};
 }
