@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Toggle hold-to-zoom mode in Hyprland.
+#
+# All logic lives in zoom.lua inside Hyprland's Lua VM; this is just the switch.
+# While the mode is off, no bind of ours exists.
+
+set -u
+
+MODULE="${XDG_CONFIG_HOME:-$HOME/.config}/caelestia/zoom.lua"
+MARKER="hyprzoom:"
+
+is_on() {
+    hyprctl binds | grep -q "$MARKER"
+}
+
+zoom_on() {
+    [[ -r "$MODULE" ]] || { echo "zoom: module not found: $MODULE" >&2; exit 1; }
+    # dofile is idempotent: the module tears down a previous load before installing.
+    hyprctl eval "dofile('$MODULE')" >/dev/null
+    if is_on; then
+        echo "zoom: on"
+    else
+        echo "zoom: failed to install binds (see 'hyprctl eval' output)" >&2
+        exit 1
+    fi
+}
+
+zoom_off() {
+    # Reset the factor unconditionally, so this doubles as an unstick button when
+    # state was lost (Hyprland reloaded, release event dropped).
+    hyprctl eval "if HYPRZOOM and HYPRZOOM.teardown then HYPRZOOM.teardown() end
+                  hl.config({ cursor = { zoom_factor = 1.0 } })" >/dev/null
+    echo "zoom: off"
+}
+
+case "${1:-toggle}" in
+    on)     zoom_on ;;
+    off)    zoom_off ;;
+    toggle) if is_on; then zoom_off; else zoom_on; fi ;;
+    status)
+        if is_on; then
+            echo "zoom: on (factor $(hyprctl getoption cursor:zoom_factor | awk '/float/{print $2}'))"
+        else
+            echo "zoom: off"
+        fi
+        ;;
+    *)
+        echo "usage: zoom [on|off|toggle|status]" >&2
+        exit 2
+        ;;
+esac
